@@ -1,4 +1,8 @@
 import pandas as pd
+from .globals import *
+from util import *
+
+
 
 def getSecData(data: pd.DataFrame): #converts data into a list
     list1 = []
@@ -12,21 +16,23 @@ def getSecData(data: pd.DataFrame): #converts data into a list
 
 def formatSecData(data: pd.DataFrame): #Converts the list into a pandas Dataframe
     data.pop(0)
-    print(data[0])
-    
-    bruh3 = {"First Name":[], "Last Name":[], "ID":[], "Grades":[]}
-    
+    bruh3 = {FIRST_NAME_HEADER:[], LAST_NAME_HEADER:[], ID_HEADER:[], GRADE_HEADER:[], GRADE_VALUE_HEADER:[]}
     df = pd.DataFrame(bruh3)
-    
     for x in range(0, len(data), 4):
-        df.loc[x] = [data[x], data[x+1], data[x+2], data[x+3]]
+        df.loc[int(x/4+1)] = [data[x].strip(), data[x+1].strip(), data[x+2].strip(), data[x+3].strip(), gradeToValue(data[x+3])]
     return df
 
 def readSecData(filename: str):
     bruh = pd.read_csv(filename, sep=" ", header=None)
+    creditHours = bruh.iloc[0][1]
     bruh2 = getSecData(bruh)
     df = formatSecData(bruh2)
-    return df
+
+    secData = {
+        "data": df,
+        "creditHours": creditHours
+    }
+    return secData
 
 def readGrpData(filename: str):
     contents = open(filename, 'r')
@@ -42,4 +48,3 @@ def readRunData(filename: str):
     data = [item.strip() for item in data if not item.isspace()]
     return data
 
-print(readRunData("./data/TESTRUN.RUN"))

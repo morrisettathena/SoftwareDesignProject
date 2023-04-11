@@ -1,10 +1,6 @@
 import os
+from .globals import *
 
-
-RUN_EXT = ".RUN"
-GRP_EXT = ".GRP"
-SEC_EXT = ".SEC"
-OTH_TYP = "other"
 
 def getFileType(filename: str):
     if filename.endswith(RUN_EXT):
@@ -28,11 +24,9 @@ def getFileData(path: str):
 
     for item in files_list:
         fileType = getFileType(path + "/" + item)
-        
         files[fileType].append(item)
 
     return files
 
 
 
-print(getFiles("./data"))
