@@ -1,14 +1,15 @@
+import globals as g
 
 GRADEMAP = {
     "A": 4,
-    "A-": 3.7,
-    "B+": 3.3,
+    "A-": 3.67,
+    "B+": 3.33,
     "B": 3,
-    "B-": 2.7,
-    "C+": 2.3,
+    "B-": 2.67,
+    "C+": 2.33,
     "C": 2,
-    "C-": 1.7,
-    "D+": 1.3,
+    "C-": 1.67,
+    "D+": 1.33,
     "D": 1.0,
     "F": 0,
     "I": None,
@@ -35,3 +36,7 @@ def isStandard(s: str):
     if not isRegistered(s):
         raise ValueError("not a registered grade type")
     return GRADEMAP[s] == "N"
+
+def constructPath(path: str, filename: str):
+    return path + g.FILE_SEP + filename
+    
