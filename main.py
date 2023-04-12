@@ -2,6 +2,7 @@ import reader
 import globals as g
 import calculation
 import util as u
+from collections import OrderedDict
 
 PRINTSECTIONSTATS = True
 PRINTGROUPSTATS = True
@@ -53,14 +54,21 @@ def printSecStats(secData: dict):
     for item in secData:
         print("\n" + item + " stats:")
         for i in secData[item]:
-            print(i + ": " + str(secData[item][i]))
+            if type(secData[item][i]) == dict:
+                print(OrderedDict(sorted(secData[item][i].items())))
+            else:
+                print(i + ": " + str(secData[item][i]))
+
         print("*"*30)
 
 def printGrpStats(grpData: dict):
     for item in grpData:
         print("\n" + item + " stats:")
         for i in grpData[item]:
-            print(i + ": " + str(grpData[item][i]))
+            if type(grpData[item][i]) == dict:
+                print(OrderedDict(sorted(grpData[item][i].items())))
+            else:
+                print(i + ": " + str(grpData[item][i]))
         print("*"*30)
 
 def main():

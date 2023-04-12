@@ -8,3 +8,4 @@ ID_HEADER = "ID"
 GRADE_HEADER = "Grades"
 GRADE_VALUE_HEADER = "GradeVal"
 FILE_SEP = "/"
+DEC_PREC = 2
