@@ -55,7 +55,7 @@ def printSecStats(secData: dict):
         print("\n" + item + " stats:")
         for i in secData[item]:
             if type(secData[item][i]) == dict:
-                print(OrderedDict(sorted(secData[item][i].items())))
+                print(i + ": " + str(OrderedDict(sorted(secData[item][i].items()))))
             else:
                 print(i + ": " + str(secData[item][i]))
 
@@ -66,7 +66,7 @@ def printGrpStats(grpData: dict):
         print("\n" + item + " stats:")
         for i in grpData[item]:
             if type(grpData[item][i]) == dict:
-                print(OrderedDict(sorted(grpData[item][i].items())))
+                print(i + ": " + str(OrderedDict(sorted(grpData[item][i].items()))))
             else:
                 print(i + ": " + str(grpData[item][i]))
         print("*"*30)
@@ -114,7 +114,6 @@ def main():
                 printSecStats(secData)
             if PRINTGROUPSTATS:
                 printGrpStats(grpData)
-
 
             if useSameFolder():
                 break
