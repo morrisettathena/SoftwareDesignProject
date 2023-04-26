@@ -71,51 +71,55 @@ def printGrpStats(grpData: dict):
                 print(i + ": " + str(grpData[item][i]))
         print("*"*30)
 
-def main():
+def fetch(originalpath: str):
+        path = str("/home/jcm/Documents/classes/SoftwareDesignProject/data")
+        print(path)
+        runFile = str("TESTRUN.RUN")
+        #runFile = originalpath[originalpath.rindex("/")+1:]
+        #path = originalpath[:originalpath.rindex("/")]
 
-    while True:
-        path = getFolder()
+        print(runFile)
+
+        
         folderData = reader.getFolderData(path)
         runData = folderData[g.RUN_EXT]
-        if len(runData) == 0:
-            print("No run files in folder")
 
-        while True:
 
-            runFile = selectRun(runData)
-            grps: list = reader.readRunFile(u.constructPath(path, runFile))
-            secs = []
+        grps: list = reader.readRunFile(u.constructPath(path, runFile))
+        secs = []
 
-            if not checkGrps(folderData, grps):
-                print("Could not use Run file, a group from the Run file was not found in folder\n")
-                break
+        #if not checkGrps(folderData, grps):
+            #print("Could not use Run file, a group from the Run file was not found in folder\n")
+            #break
 
-            for grpFile in grps:
-                grpSecs = reader.readGrpFile(u.constructPath(path, grpFile))
-                for secFile in grpSecs:
-                    if secFile not in secs:
-                        secs.append(secFile)
+        for grpFile in grps:
+            grpSecs = reader.readGrpFile(u.constructPath(path, grpFile))
+            for secFile in grpSecs:
+                if secFile not in secs:
+                    secs.append(secFile)
 
-            if not checkSecs(folderData, secs):
-                print("Could not use Run file, a section from one of the Group files was not found in folder\n")
-                break
+        #if not checkSecs(folderData, secs):
+            #print("Could not use Run file, a section from one of the Group files was not found in folder\n")
+            #break
 
-            secData = {}
-            grpData = {}
+        secData = {}
+        grpData = {}
 
-            for secFile in secs:
-                    secData[secFile] = calculation.calculateSectionData(reader.readSecFile(u.constructPath(path, secFile)))
+        for secFile in secs:
+                secData[secFile] = calculation.calculateSectionData(reader.readSecFile(u.constructPath(path, secFile)))
 
-            for grpFile in grps:
-                grpSecs = reader.readGrpFile(u.constructPath(path, grpFile))
-                grpData[grpFile] = calculation.calculateGroupData(secData, grpSecs)
+        for grpFile in grps:
+            grpSecs = reader.readGrpFile(u.constructPath(path, grpFile))
+            grpData[grpFile] = calculation.calculateGroupData(secData, grpSecs)
 
-            if PRINTSECTIONSTATS:
-                printSecStats(secData)
-            if PRINTGROUPSTATS:
-                printGrpStats(grpData)
+        print("hi I'm here")
+        print()
+        return [secData, grpData]
 
-            if useSameFolder():
-                break
-        
-main()
+            #if PRINTSECTIONSTATS:
+                #printSecStats(secData)
+            #if PRINTGROUPSTATS:
+                #printGrpStats(grpData)
+
+            #if useSameFolder():
+                #break
