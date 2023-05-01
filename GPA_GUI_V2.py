@@ -34,7 +34,7 @@ dir_box.grid(row=3, column=0, padx=20, pady=10, sticky="w")
 
 # FILE CONTENTS BOX
 file_box = tk.Text(root, height=12, font=("Arial", 14), bg="white", fg="#a3a3a3", bd=0)
-file_box.insert(tk.END, " File contents will be displayed here.")
+file_box.insert(tk.END, " File contents will be displayed here")
 file_box.bind("<FocusIn>", lambda event: file_box.delete(1.0, tk.END))
 file_box.grid(row=5, column=0, padx=20, pady=30, sticky="w", columnspan=2)
 
@@ -67,9 +67,9 @@ def select_file():
 # Function to clear text from all textboxes
 def clear_text():
     dir_box.delete(0, tk.END)
-    dir_box.insert(0, " Enter file directory...")
+    dir_box.insert(0, " Enter file path")
     file_box.delete(1.0, tk.END)
-    file_box.insert(tk.END, " File contents will be displayed here.")
+    file_box.insert(tk.END, " File contents will be displayed here")
     calc_box.delete(1.0, tk.END)
     calc_box.insert(tk.END)
     
