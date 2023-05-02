@@ -1,3 +1,7 @@
-Need to add calculations code to calculate button
-Need to work out displaying graphs after calculate button is clicked
+GPA_GUI --> Old GUI design, not completely functional
 
+GPA_GUI_V2 --> Newer GUI Design, does not have graph function
+
+GPA_GUI_V2.1 --> Newest GUI design, has functional graph
+                 Graph does not clear and can cause overflow in box
+                 if calculate is pressed too many times
