@@ -15,11 +15,18 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import numpy as np
 import main
+import display
+import pandas
 
 root = tk.Tk()
 root.title("GPA Calculator")
 root.config(bg='#CACBD1')
 root.attributes('-fullscreen', True)
+
+index: int = 0
+sec_data = None
+grp_data = None
+pages: list = None
 
 # ROGER WILLIAMS LABEL
 title_label = ttk.Label(root, text="   Roger Williams", font=("Times New Roman", 20), foreground="white", background="#1E3261")
@@ -110,6 +117,10 @@ def exit_program():
 
 #__________________________________________________________BUTTONS________________________________________________________#
 
+# LEFT BUTTON
+left_button = ttk.Button(root, text="<<", width = 10)
+left_button.grid(row = 4, column = 3, pady=10, padx=20)
+
 # BROWSE BUTTON
 browse_button = ttk.Button(root, text="Browse", width=10)
 browse_button.grid(row=4, column=0, pady=10, padx=20, sticky="w")
@@ -121,6 +132,10 @@ calc_button.grid(row=4, column=0, pady=10, padx=20, sticky="n")
 # CLEAR BUTTON
 clear_button = ttk.Button(root, text="Clear", width=10)
 clear_button.grid(row=4, column=0, pady=10, padx=20, sticky="e")
+
+# RIGHT BUTTON
+right_button = ttk.Button(root, text=">>", width = 10)
+right_button.grid(row = 4, column = 4, pady=10, padx=20)
 
 # EXIT BUTTON
 exit_button = ttk.Button(root, text="Exit", command=exit_program, width=10)
@@ -135,27 +150,97 @@ browse_button.config(command=select_file)
 clear_button.config(command=clear_text)
 # Attach calculate function to calculate button
 
-def test():
-    data = main.fetch(dir_box.get())
-    sec_data = data[0]
-    grp_data = data[1]
 
-    sec_data.keys()
+def displayData():
+    global index, pages, grp_data, sec_data
 
     generate_graph()
+    datastr = ""
+    if pages[index].endswith("GRP"):
+        data2 = grp_data[pages[index]]
 
-    data2 = sec_data[list(sec_data.keys())[1]]
+        datastr += "\n" + "Group:\t" + str(pages[index])
+        datastr += "\n" + "Sections and Z-test:"
 
-    datastr = str(data2)
+        ztestdata = sorted(data2["ztests"].items(), key=lambda x:x[1])
+        for item in ztestdata:
+            datastr += "\n\t" + str(item[0]) + ":\t " + str(item[1])
+            if item[1] >= 2.0:
+                datastr += "SIGNIFICANTLY LOW"
+            elif item[1] <= -2.0:
+                datastr += "SIGNIFICANTLY LOW"
+        datastr += "\n"
 
-    datastr += "\n" + "Mean of section: " + str(data2["mean"])
-    datastr += "\n" + str(data2["stddev"])
-    #str += "\n" + data2["stdev"] 
+        datastr += "\n" + "Mean:\t" + str(data2["mean"])
+        datastr += "\n" + "Standard Deviation:\t" + str(data2["stddev"])
+        datastr += "\n" + "Number of Students:\t" + str(data2["numstudents"])
+        datastr += "\n" + "Grade Counts:"
+
+        gradeCounts = list(data2["gradecounts"].keys())
+        for item in gradeCounts:
+            datastr += "\n\t" + str(item) + ":\t" + str(data2["gradecounts"][item])
+
+    elif pages[index].endswith("SEC"):
+        data2 = sec_data[pages[index]]
+
+        datastr += "\n" + "Section:\t" + str(pages[index])
+        datastr += "\n" + "Credit Hours:\t" + str(data2["creditHours"]) + "\n"
+        datastr += "\n" + "Mean:\t" + str(data2["mean"])
+        datastr += "\n" + "Standard Deviation:\t" + str(data2["stddev"])
+        datastr += "\n" + "Number of Students:\t" + str(data2["numstudents"])
+        datastr += "\n" + "Grade Counts:"
+        gradeCounts = list(data2["gradecounts"].keys())
+        for item in gradeCounts:
+            datastr += "\n\t" + str(item) + ":\t" + str(data2["gradecounts"][item])
+        datastr += "\n" + "Students:\n"
+
+        pandas.set_option('display.max_rows', None)
+        pandas.set_option('display.max_columns', 3)
+        pandas.set_option('display.width', 1000)
+        pandas.set_option('display.colheader_justify', 'center')
+        pandas.set_option('display.precision', 2)        
+        datastr += data2["data"].to_string(col_space = 20)
+    calc_box.delete("1.0", tk.END)
     calc_box.insert(tk.END, datastr)
 
-    #calc_box.insert(tk.END, data[0]["COMSC110S20.SEC"])
+def shiftIndexRight():
+    global index, pages
+    if len(pages)-1 == index:
+        index = 0
+    else:
+        index += 1
 
-calc_button.config(command=lambda: [test()])
+    displayData()
+    
+def shiftIndexLeft():
+    global index, pages
+    if index == 0:
+        index = len(pages)-1
+    else:
+        index -= 1
+
+    displayData()
+    
+def getData():
+    global sec_data, grp_data, pages, index
+
+    path = dir_box.get()
+
+    if not path.endswith(".RUN"):
+        calc_box.delete("1.0", tk.END)
+        calc_box.insert(tk.END, "Not a valid RUN file")
+    else:
+        data = main.fetch(dir_box.get())
+        sec_data = data[0]
+        grp_data = data[1]
+        pages = list(grp_data.keys())
+        pages.extend(list(sec_data.keys()))
+        index = 0
+        displayData()
+
+calc_button.config(command= getData)
+left_button.config(command = shiftIndexLeft)
+right_button.config(command = shiftIndexRight)
 
 #__________________________________________________________WEIGHTS________________________________________________________#
 

@@ -72,18 +72,8 @@ def printGrpStats(grpData: dict):
         print("*"*30)
 
 def fetch(originalpath: str):
-        path = str("/home/jcm/Documents/classes/SoftwareDesignProject/data")
-        print(path)
-        runFile = str("TESTRUN.RUN")
-        #runFile = originalpath[originalpath.rindex("/")+1:]
-        #path = originalpath[:originalpath.rindex("/")]
-
-        print(runFile)
-
-        
-        folderData = reader.getFolderData(path)
-        runData = folderData[g.RUN_EXT]
-
+        runFile = originalpath[originalpath.rindex("/")+1:]
+        path = originalpath[:originalpath.rindex("/")]
 
         grps: list = reader.readRunFile(u.constructPath(path, runFile))
         secs = []
@@ -112,14 +102,4 @@ def fetch(originalpath: str):
             grpSecs = reader.readGrpFile(u.constructPath(path, grpFile))
             grpData[grpFile] = calculation.calculateGroupData(secData, grpSecs)
 
-        print("hi I'm here")
-        print()
         return [secData, grpData]
-
-            #if PRINTSECTIONSTATS:
-                #printSecStats(secData)
-            #if PRINTGROUPSTATS:
-                #printGrpStats(grpData)
-
-            #if useSameFolder():
-                #break
