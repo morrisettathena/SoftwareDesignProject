@@ -166,7 +166,7 @@ def displayData():
         for item in ztestdata:
             datastr += "\n\t" + str(item[0]) + ":\t " + str(item[1])
             if item[1] >= 2.0:
-                datastr += "SIGNIFICANTLY LOW"
+                datastr += "SIGNIFICANTLY HIGH"
             elif item[1] <= -2.0:
                 datastr += "SIGNIFICANTLY LOW"
         datastr += "\n"
