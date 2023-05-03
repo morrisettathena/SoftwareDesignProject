@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[29]:
-
-
 # USE
 
 #__________________________________________________________TITLES_________________________________________________________#
@@ -17,11 +11,21 @@ import numpy as np
 import main
 import display
 import pandas
+from tkinter import * 
+from tkinter.ttk import *
 
 root = tk.Tk()
 root.title("GPA Calculator")
 root.config(bg='#CACBD1')
-root.attributes('-fullscreen', True)
+#root.attributes('-fullscreen', True)
+root.geometry('1280x800')
+root.resizable(width=0, height=0)
+
+photo = PhotoImage(file = "leftarrow.png")
+photoimage = photo.subsample(10, 10)
+
+photo2 = PhotoImage(file = "rightarrow.png")
+photoimage2 = photo2.subsample(10, 10)
 
 index: int = 0
 sec_data = None
@@ -53,7 +57,7 @@ dir_box.grid(row=3, column=0, padx=20, pady=10, sticky="w")
 file_box = tk.Text(root, height=12, font=("Arial", 14), bg="white", fg="#a3a3a3", bd=0)
 file_box.insert(tk.END, ' File contents will be displayed here.\n\n If entering manually, use the following format (include quotations):\n\n "Last","First","Student ID","Grade"')
 file_box.bind("<FocusIn>", lambda event: file_box.delete(1.0, tk.END))
-file_box.grid(row=5, column=0, padx=20, pady=30, sticky="w", columnspan=2)
+file_box.grid(row=5, column=0, padx=20, pady=20, sticky="w", columnspan=2)
 
 # CALCULATION BOX
 calc_box = tk.Text(root, height=12, font=("Arial", 14), bg="white", fg="#a3a3a3", bd=0)
@@ -118,8 +122,8 @@ def exit_program():
 #__________________________________________________________BUTTONS________________________________________________________#
 
 # LEFT BUTTON
-left_button = ttk.Button(root, text="<<", width = 10)
-left_button.grid(row = 4, column = 3, pady=10, padx=20)
+left_button = tk.Button(root, width = 25,  image = photoimage, bd=0)
+left_button.grid(row = 4, columnspan=2, column = 3, pady=10, padx=250, sticky='w')
 
 # BROWSE BUTTON
 browse_button = ttk.Button(root, text="Browse", width=10)
@@ -134,8 +138,8 @@ clear_button = ttk.Button(root, text="Clear", width=10)
 clear_button.grid(row=4, column=0, pady=10, padx=20, sticky="e")
 
 # RIGHT BUTTON
-right_button = ttk.Button(root, text=">>", width = 10)
-right_button.grid(row = 4, column = 4, pady=10, padx=20)
+right_button = tk.Button(root, text=">>", width = 25, image = photoimage2, bd=0)
+right_button.grid(row = 4, columnspan=2, column = 4, pady=10, padx=210, sticky='e')
 
 # EXIT BUTTON
 exit_button = ttk.Button(root, text="Exit", command=exit_program, width=10)
@@ -150,6 +154,7 @@ browse_button.config(command=select_file)
 clear_button.config(command=clear_text)
 # Attach calculate function to calculate button
 
+#___________________________________________________________FUNCTIONS________________________________________________________#
 
 def displayData():
     global index, pages, grp_data, sec_data
@@ -250,4 +255,3 @@ root.columnconfigure(1, weight=2)
 root.rowconfigure(3, weight=1)
 
 root.mainloop()
-
