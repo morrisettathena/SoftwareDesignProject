@@ -3,7 +3,6 @@ import globals as g
 
 def calculateSectionData(secdata: dict):
     df: pd.DataFrame = secdata["data"]
-
     secdata["mean"] = round(df[g.GRADE_VALUE_HEADER].mean(), g.DEC_PREC)
     secdata["stddev"] = round(df[g.GRADE_VALUE_HEADER].std(ddof=0), g.DEC_PREC)
     secdata["numstudents"] = df.shape[0]
