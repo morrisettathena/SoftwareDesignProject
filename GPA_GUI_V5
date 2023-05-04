@@ -101,13 +101,12 @@ def generate_graph():
         num_students.append(count)
 
     ax.bar(grades, num_students)
-
     # Add labels and title
-    ax.grid(axis='y')
     ax.set_xlabel('Grades')
     ax.set_ylabel('Number of Students')
     ax.set_title('Distribution of Grades')
-    ax.set_yticks(range(0, 51, 2))
+    ax.set_yticks(range(0, 500, 50))
+    ax.grid(axis='y', linestyle='--', alpha=0.7)
 
     # Add bar chart to window
     canvas = FigureCanvasTkAgg(fig, master=graph_box)
@@ -238,14 +237,7 @@ def displayData():
     calc_box.delete("1.0", tk.END)
     calc_box.insert(tk.END, datastr)
 
-    # Update the graph with new data
-    ax = plt.gca()
-    ax.grid(axis='y')
-    ax.clear()
-    ax.bar(grades, num_students)
-    canvas = FigureCanvasTkAgg(fig, master=graph_box)
-    canvas.draw()
-    canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
+    
 
     
 
