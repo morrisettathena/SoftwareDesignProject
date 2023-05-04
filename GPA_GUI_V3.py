@@ -1,11 +1,10 @@
-# USE
-
 #__________________________________________________________TITLES_________________________________________________________#
 
 import tkinter as tk
 from tkinter import ttk, filedialog
 from PIL import ImageTk, Image
 import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import numpy as np
 import main
@@ -20,12 +19,6 @@ root.config(bg='#CACBD1')
 root.geometry('1280x800')
 root.resizable(width=0, height=0)
 
-#photo = PhotoImage(file = "leftarrow.png")
-#photoimage = photo.subsample(10, 10)
-
-#photo2 = PhotoImage(file = "rightarrow.png")
-#photoimage2 = photo2.subsample(10, 10)
-
 #data to be stored for every .RUN file
 index: int = 0
 sec_data = None
@@ -33,7 +26,7 @@ grp_data = None
 pages: list = None
 
 # ROGER WILLIAMS LABEL
-title_label = ttk.Label(root, text="Roger Williams", font=("Times New Roman", 20), foreground="white", background="#1E3261")
+title_label = ttk.Label(root, text="   Roger Williams", font=("Times New Roman", 20), foreground="white", background="#1E3261")
 title_label.grid(row=1, column=0, columnspan=5, pady=(10, 0), sticky="nsew")
 
 # UNIVERSITY LABEL
@@ -54,13 +47,13 @@ dir_box.bind("<FocusIn>", lambda event: dir_box.delete(0, tk.END))
 dir_box.grid(row=3, column=0, padx=20, pady=10, sticky="w")
 
 # FILE CONTENTS BOX
-file_box = tk.Text(root, height=12, font=("Arial", 14), bg="white", fg="#a3a3a3", bd=0)
+file_box = tk.Text(root, height=10, font=("Arial", 14), bg="white", fg="#a3a3a3", bd=0)
 file_box.insert(tk.END, ' File contents will be displayed here.\n\n If entering manually, use the following format (include quotations):\n\n "Last","First","Student ID","Grade"')
 file_box.bind("<FocusIn>", lambda event: file_box.delete(1.0, tk.END))
-file_box.grid(row=5, column=0, padx=20, pady=20, sticky="w", columnspan=2)
+file_box.grid(row=5, column=0, padx=20, pady=10, sticky="w", columnspan=2)
 
 # CALCULATION BOX
-calc_box = tk.Text(root, height=12, font=("Arial", 14), bg="white", fg="#a3a3a3", bd=0)
+calc_box = tk.Text(root, height=13, font=("Arial", 14), bg="white", fg="#a3a3a3", bd=0)
 calc_box.bind("<FocusIn>", lambda event: calc_box.delete(1.0, tk.END))
 calc_box.grid(row=6, column=0, padx=20, pady=10, sticky="nsew", columnspan=2)
 
@@ -88,18 +81,38 @@ def select_file():
 
 # Define the function to generate the graph
 def generate_graph():
-    # Generate some data to plot
-    x = np.linspace(-5, 5, 100)
-    y = x ** 2
-    
-    # Create a new figure and plot the data
-    fig = plt.Figure(figsize=(6, 4), dpi=100)
-    ax = fig.add_subplot(111)
-    ax.plot(x, y)
-    
-    # Create a Tkinter canvas to display the figure
+    global index, pages, grp_data, sec_data
+    fig = Figure(figsize=(5, 4))
+    grades = [70, 75, 80, 82, 85, 88, 90, 92, 95, 98]
+    num_students = [3, 5, 10, 12, 15, 20, 18, 10, 8, 4]
+
+    # Create boxplot
+    fig, ax = plt.subplots()
+    ax.boxplot(grades)
+
+    data = None
+    if pages[index].endswith("GRP"):
+        data = grp_data[pages[index]]
+    else:
+        data = sec_data[pages[index]]
+
+    numstudents = data["numstudents"]
+    counts = data["gradecounts"]
+
+    # Add labels and title
+    ax.set_xlabel('Grades')
+    ax.set_ylabel('Number of Students')
+    ax.set_title('Distribution of Grades')
+    ax.set_yticks(range(0, numstudents))
+
+
+
+    # Add boxplot to window
     canvas = FigureCanvasTkAgg(fig, master=graph_box)
     canvas.draw()
+    canvas.get_tk_widget().pack()
+    
+
     
     # Update the graph_box with the canvas
     graph_box.delete(0, tk.END)
@@ -122,8 +135,8 @@ def exit_program():
 #__________________________________________________________BUTTONS________________________________________________________#
 
 # LEFT BUTTON
-left_button = tk.Button(root, width = 25, bd=0)
-left_button.grid(row = 4, columnspan=2, column = 3, pady=10, padx=250, sticky='w')
+left_button = tk.Button(root, width = 10, text="<<", bd=0, fg='white', bg='#1E3261')
+left_button.grid(row = 3, columnspan=2, column = 3, pady=10, padx=250, sticky='w')
 
 # BROWSE BUTTON
 browse_button = ttk.Button(root, text="Browse", width=10)
@@ -138,8 +151,8 @@ clear_button = ttk.Button(root, text="Clear", width=10)
 clear_button.grid(row=4, column=0, pady=10, padx=20, sticky="e")
 
 # RIGHT BUTTON
-right_button = tk.Button(root, text=">>", width = 25, bd=0)
-right_button.grid(row = 4, columnspan=2, column = 4, pady=10, padx=210, sticky='e')
+right_button = tk.Button(root, text=">>", width = 10, bd=0, fg='white', bg='#1E3261')
+right_button.grid(row = 3, columnspan=2, column = 4, pady=10, padx=210, sticky='e')
 
 # EXIT BUTTON
 exit_button = ttk.Button(root, text="Exit", command=exit_program, width=10)
