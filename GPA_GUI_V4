@@ -85,12 +85,14 @@ def generate_graph():
     
     fig, ax = plt.subplots(figsize=(6, 4))
     
-    grades = ['A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'F']
-    num_students = [0, 3, 5, 10, 12, 15, 20, 18, 10, 8, 4, 0]
+    grades = ['A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'F', 'I', 'P', 'NP', 'W']
+    num_students = [0, 3, 5, 10, 12, 15, 20, 18, 10, 8, 4, 0, 2, 6, 4, 1]
+
     
     ax.bar(grades, num_students)
     
     # Add labels and title
+    ax.grid(axis='y')
     ax.set_xlabel('Grades')
     ax.set_ylabel('Number of Students')
     ax.set_title('Distribution of Grades')
@@ -111,11 +113,13 @@ def clear_text():
     calc_box.insert(tk.END, "")
 
 def clear_canvas():
-    global graph_box, canvas
-    graph_box.delete("all")
-    canvas = FigureCanvasTkAgg(fig, master=graph_box)
-    canvas.draw()
-    canvas.get_tk_widget().pack()
+    global graph_canvas, graph_fig, graph_ax
+    # Clear the old graph if it exists
+    if graph_fig is not None:
+        graph_ax.clear()
+        graph_fig = None
+        graph_canvas.draw()
+        graph_canvas.get_tk_widget().destroy()
 
 # Function to exit program
 def exit_program():
@@ -146,18 +150,6 @@ right_button.grid(row = 3, columnspan=2, column = 4, pady=10, padx=210, sticky='
 # EXIT BUTTON
 exit_button = ttk.Button(root, text="Exit", command=exit_program, width=10)
 exit_button.grid(row=1, column=4, sticky="ne", padx=7, pady=7)
-
-#___________________________________________________________ATTACH________________________________________________________#
-    
-# Attach select_file function to browse button
-browse_button.config(command=select_file)
-
-# Attach clear_text function to clear button
-clear_button.config(command=clear_text)
-# Attach calculate function to calculate button
-left_button.config(command=clear_canvas)
-
-right_button.config(command=clear_canvas)
 
 #___________________________________________________________FUNCTIONS________________________________________________________#
 
@@ -236,6 +228,10 @@ def shiftIndexRight():
     else:
         index += 1
 
+    # Clear graph from canvas
+    for widget in graph_box.winfo_children():
+        widget.destroy()
+
     displayData()
     
 def shiftIndexLeft():
@@ -248,6 +244,10 @@ def shiftIndexLeft():
         index = len(pages)-1
     else:
         index -= 1
+    
+    # Clear graph from canvas
+    for widget in graph_box.winfo_children():
+        widget.destroy()
 
     displayData()
     
@@ -274,9 +274,19 @@ def getData():
         index = 0
         displayData()
         
+#___________________________________________________________ATTACH________________________________________________________#
+    
+# Attach select_file function to browse button
+browse_button.config(command=select_file)
 
+# Attach clear_text function to clear button
+clear_button.config(command=clear_text)
+
+# Attach calc_text function to calc button
 calc_button.config(command= getData)
-left_button.config(command = shiftIndexLeft)
+
+# Attach clear_canvas function to arrow buttons
+left_button.config(command = (shiftIndexLeft))
 right_button.config(command = shiftIndexRight)
 
 #__________________________________________________________WEIGHTS________________________________________________________#
