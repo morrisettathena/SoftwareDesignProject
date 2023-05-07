@@ -81,40 +81,29 @@ def select_file():
             file_box.delete(1.0, tk.END)
             file_box.insert(tk.END, file_contents)
 
-def generate_graph():
+def generate_graph(dictData: dict):
     global index, pages, grp_data, sec_data
 
-    graph_box.delete(0, tk.END)
+    for item in graph_box.winfo_children():
+        item.destroy()
 
-    fig, ax = plt.subplots(figsize=(6, 4))
+    fig = plt.Figure(figsize=(6, 4))
+    a = fig.add_subplot(111)
 
-    grades = ['A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'F', 'I', 'P', 'NP', 'W']
-    num_students = []
-    
-    # Count the number of students for each grade
-    for grade in grades:
-        count = 0
-        for data in sec_data.values():
-            count += data['gradecounts'].get(grade, 0)
-        for data in grp_data.values():
-            count += data['gradecounts'].get(grade, 0)
-        num_students.append(count)
+    ls = sorted([(k, v) for k, v in dictData.items()], key = lambda x:x[0])
+    ls2 = list(zip(*ls))
 
-    ax.bar(grades, num_students)
-    # Add labels and title
-    ax.set_xlabel('Grades')
-    ax.set_ylabel('Number of Students')
-    ax.set_title('Distribution of Grades')
-    ax.set_yticks(range(0, 500, 50))
-    ax.grid(axis='y', linestyle='--', alpha=0.7)
 
+    a.bar(ls2[0], ls2[1])
+    a.set_xlabel("Grades")
+    a.set_ylabel("Number of Students")
+    a.set_title("Distribution of Grades")
     # Add bar chart to window
     canvas = FigureCanvasTkAgg(fig, master=graph_box)
     canvas.draw()
     canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
 
     # Return grades and num_students
-    return grades, num_students
 
 def clear_text():
     dir_box.delete(0, tk.END)
@@ -172,8 +161,7 @@ def displayData():
         return
 
     # Generate the graph and get the grades and num_students values
-    grades, num_students = generate_graph()
-
+    gradeCountsDict = None
     datastr = ""
     if pages[index].endswith("GRP"):
         data2 = grp_data[pages[index]]
@@ -197,14 +185,14 @@ def displayData():
         datastr += "\n" + "Number of Students:\t" + str(data2["numstudents"])
         datastr += "\n" + "Grade Counts:"
 
-        gradeCounts = list(data2["gradecounts"].keys())
-        gradeCounts.sort()
+        gradeCounts = sorted(list(data2["gradecounts"].keys()), key =lambda x:util.getOrder(x), reverse=True)
         for item in gradeCounts:
             datastr += "\n\t" + str(item) + ":\t" + str(data2["gradecounts"][item])
 
         for grade, count in data2["gradecounts"].items():
             grade_counts[grade] = count
             datastr += "\n\t" + str(grade) + ":\t" + str(count)
+        gradeCountsDict = data2["gradecounts"]
 
     elif pages[index].endswith("SEC"):
         data2 = sec_data[pages[index]]
@@ -217,10 +205,11 @@ def displayData():
         datastr += "\n" + "Standard Deviation:\t" + str(data2["stddev"])
         datastr += "\n" + "Number of Students:\t" + str(data2["numstudents"])
         datastr += "\n" + "Grade Counts:"
-        gradeCounts = list(data2["gradecounts"].keys())
-        gradeCounts.sort()
+        gradeCounts = sorted(list(data2["gradecounts"].keys()), key =lambda x:util.getOrder(x), reverse=True)
         for item in gradeCounts:
             datastr += "\n\t" + str(item) + ":\t" + str(data2["gradecounts"][item])
+
+        gradeCountsDict = data2["gradecounts"]
         datastr += "\n" + "Students:"
 
         students: pandas.DataFrame = data2["data"]
@@ -234,12 +223,9 @@ def displayData():
                 str(students.iloc[i][3]).strip().ljust(6, " "),
                 str(students.iloc[i][4]).strip().ljust(8, " ")
             )
+    generate_graph(gradeCountsDict)
     calc_box.delete("1.0", tk.END)
     calc_box.insert(tk.END, datastr)
-
-    
-
-    
 
 def shiftIndexRight():
     global index, pages
