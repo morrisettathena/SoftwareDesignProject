@@ -267,6 +267,20 @@ def shiftIndexLeft():
         widget.destroy()
 
     displayData()
+
+def sendToOutput(file: str, path: str):
+    
+    f = open(path + "/" + file + ".STATS", "w")
+    for item in grp_data:
+        f.write(item + " data: " + str(grp_data[item]) + "\n")
+    for item in sec_data:
+        z = sec_data[item].copy()
+        z.pop("data")
+        
+        f.write(item + " data: " + str(z) + "\n")
+        
+    print(path)
+    print("sent data to output")
     
 def getData():
     global sec_data, grp_data, pages, index
@@ -286,6 +300,11 @@ def getData():
             return
         sec_data = data[0]
         grp_data = data[1]
+
+        runFile = path[path.rindex("/")+1:]
+        outputpath = path[:path.rindex("/")]
+        sendToOutput(runFile, outputpath)
+        
         pages = list(grp_data.keys())
         pages.extend(list(sec_data.keys()))
         index = 0
