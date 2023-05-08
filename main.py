@@ -28,19 +28,11 @@ def fetch(originalpath: str):
         grps: list = reader.readRunFile(u.constructPath(path, runFile))
         secs = []
 
-        #if not checkGrps(folderData, grps):
-            #print("Could not use Run file, a group from the Run file was not found in folder\n")
-            #break
-
         for grpFile in grps:
             grpSecs = reader.readGrpFile(u.constructPath(path, grpFile))
             for secFile in grpSecs:
                 if secFile not in secs:
                     secs.append(secFile)
-
-        #if not checkSecs(folderData, secs):
-            #print("Could not use Run file, a section from one of the Group files was not found in folder\n")
-            #break
 
         secData = {}
         grpData = {}

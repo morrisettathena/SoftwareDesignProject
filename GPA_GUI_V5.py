@@ -1,28 +1,27 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[29]:
-
-
-# USE
-
 #__________________________________________________________TITLES_________________________________________________________#
 
 import tkinter as tk
 from tkinter import ttk, filedialog
 from PIL import ImageTk, Image
 import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import numpy as np
 import main
-import display
 import pandas
+import util
+from tkinter import * 
+from tkinter.ttk import *
+import matplotlib.ticker as ticker
 
 root = tk.Tk()
 root.title("GPA Calculator")
 root.config(bg='#CACBD1')
-root.attributes('-fullscreen', True)
+#root.attributes('-fullscreen', True)
+root.geometry('1280x800')
+root.resizable(width=0, height=0)
 
+#data to be stored for every .RUN file
 index: int = 0
 sec_data = None
 grp_data = None
@@ -50,13 +49,13 @@ dir_box.bind("<FocusIn>", lambda event: dir_box.delete(0, tk.END))
 dir_box.grid(row=3, column=0, padx=20, pady=10, sticky="w")
 
 # FILE CONTENTS BOX
-file_box = tk.Text(root, height=12, font=("Arial", 14), bg="white", fg="#a3a3a3", bd=0)
+file_box = tk.Text(root, height=6, font=("Arial", 14), bg="white", fg="#a3a3a3", bd=0)
 file_box.insert(tk.END, ' File contents will be displayed here.\n\n If entering manually, use the following format (include quotations):\n\n "Last","First","Student ID","Grade"')
 file_box.bind("<FocusIn>", lambda event: file_box.delete(1.0, tk.END))
-file_box.grid(row=5, column=0, padx=20, pady=30, sticky="w", columnspan=2)
+file_box.grid(row=5, column=0, padx=20, pady=10, sticky="w", columnspan=2)
 
 # CALCULATION BOX
-calc_box = tk.Text(root, height=12, font=("Arial", 14), bg="white", fg="#a3a3a3", bd=0)
+calc_box = tk.Text(root, height=17, font=("Arial", 14), bg="white", fg="#a3a3a3", bd=0)
 calc_box.bind("<FocusIn>", lambda event: calc_box.delete(1.0, tk.END))
 calc_box.grid(row=6, column=0, padx=20, pady=10, sticky="nsew", columnspan=2)
 
@@ -82,27 +81,30 @@ def select_file():
             file_box.delete(1.0, tk.END)
             file_box.insert(tk.END, file_contents)
 
-# Define the function to generate the graph
-def generate_graph():
-    # Generate some data to plot
-    x = np.linspace(-5, 5, 100)
-    y = x ** 2
-    
-    # Create a new figure and plot the data
-    fig = plt.Figure(figsize=(6, 4), dpi=100)
-    ax = fig.add_subplot(111)
-    ax.plot(x, y)
-    
-    # Create a Tkinter canvas to display the figure
+def generate_graph(dictData: dict):
+    global index, pages, grp_data, sec_data
+
+    for item in graph_box.winfo_children():
+        item.destroy()
+
+    fig = plt.Figure(figsize=(6, 4))
+    a = fig.add_subplot(111)
+
+    ls = sorted([(k, v) for k, v in dictData.items()], key = lambda x:x[0])
+    ls2 = list(zip(*ls))
+
+
+    a.bar(ls2[0], ls2[1])
+    a.set_xlabel("Grades")
+    a.set_ylabel("Number of Students")
+    a.set_title("Distribution of Grades")
+    # Add bar chart to window
     canvas = FigureCanvasTkAgg(fig, master=graph_box)
     canvas.draw()
-    
-    # Update the graph_box with the canvas
-    graph_box.delete(0, tk.END)
-    canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
-    graph_box.insert(0, "Graph generated successfully!")
-            
-# Function to clear text from all textboxes
+    canvas.get_tk_widget().pack(fill=tk.BOTH, expand=False)
+
+    # Return grades and num_students
+
 def clear_text():
     dir_box.delete(0, tk.END)
     dir_box.insert(0, " Enter file path")
@@ -110,7 +112,16 @@ def clear_text():
     file_box.insert(tk.END, ' File contents will be displayed here.\n\n If entering manually, use the following format (include quotations):\n\n "Last","First","Student ID","Grade"')
     calc_box.delete(1.0, tk.END)
     calc_box.insert(tk.END, "")
-    
+
+def clear_canvas():
+    global graph_canvas, graph_fig, graph_ax
+    # Clear the old graph if it exists
+    if graph_fig is not None:
+        graph_ax.clear()
+        graph_fig = None
+        #graph_canvas.draw()
+        graph_canvas.get_tk_widget().destroy()
+
 # Function to exit program
 def exit_program():
     root.destroy()
@@ -118,8 +129,8 @@ def exit_program():
 #__________________________________________________________BUTTONS________________________________________________________#
 
 # LEFT BUTTON
-left_button = ttk.Button(root, text="<<", width = 10)
-left_button.grid(row = 4, column = 3, pady=10, padx=20)
+left_button = tk.Button(root, width = 10, text="<<", bd=0, fg='white', bg='#1E3261')
+left_button.grid(row = 3, columnspan=2, column = 3, pady=10, padx=250, sticky='w')
 
 # BROWSE BUTTON
 browse_button = ttk.Button(root, text="Browse", width=10)
@@ -134,30 +145,28 @@ clear_button = ttk.Button(root, text="Clear", width=10)
 clear_button.grid(row=4, column=0, pady=10, padx=20, sticky="e")
 
 # RIGHT BUTTON
-right_button = ttk.Button(root, text=">>", width = 10)
-right_button.grid(row = 4, column = 4, pady=10, padx=20)
+right_button = tk.Button(root, text=">>", width = 10, bd=0, fg='white', bg='#1E3261')
+right_button.grid(row = 3, columnspan=2, column = 4, pady=10, padx=210, sticky='e')
 
 # EXIT BUTTON
 exit_button = ttk.Button(root, text="Exit", command=exit_program, width=10)
 exit_button.grid(row=1, column=4, sticky="ne", padx=7, pady=7)
 
-#___________________________________________________________ATTACH________________________________________________________#
-    
-# Attach select_file function to browse button
-browse_button.config(command=select_file)
-
-# Attach clear_text function to clear button
-clear_button.config(command=clear_text)
-# Attach calculate function to calculate button
-
+#___________________________________________________________FUNCTIONS________________________________________________________#
 
 def displayData():
     global index, pages, grp_data, sec_data
 
-    generate_graph()
+    if pages is None:
+        return
+
+    # Generate the graph and get the grades and num_students values
+    gradeCountsDict = None
     datastr = ""
     if pages[index].endswith("GRP"):
         data2 = grp_data[pages[index]]
+
+        grade_counts = data2["gradecounts"]
 
         datastr += "\n" + "Group:\t" + str(pages[index])
         datastr += "\n" + "Sections and Z-test:"
@@ -176,12 +185,19 @@ def displayData():
         datastr += "\n" + "Number of Students:\t" + str(data2["numstudents"])
         datastr += "\n" + "Grade Counts:"
 
-        gradeCounts = list(data2["gradecounts"].keys())
+        gradeCounts = sorted(list(data2["gradecounts"].keys()), key =lambda x:util.getOrder(x), reverse=True)
         for item in gradeCounts:
             datastr += "\n\t" + str(item) + ":\t" + str(data2["gradecounts"][item])
 
+        for grade, count in data2["gradecounts"].items():
+            grade_counts[grade] = count
+            datastr += "\n\t" + str(grade) + ":\t" + str(count)
+        gradeCountsDict = data2["gradecounts"]
+
     elif pages[index].endswith("SEC"):
         data2 = sec_data[pages[index]]
+
+        grade_counts = data2["gradecounts"]
 
         datastr += "\n" + "Section:\t" + str(pages[index])
         datastr += "\n" + "Credit Hours:\t" + str(data2["creditHours"]) + "\n"
@@ -189,35 +205,59 @@ def displayData():
         datastr += "\n" + "Standard Deviation:\t" + str(data2["stddev"])
         datastr += "\n" + "Number of Students:\t" + str(data2["numstudents"])
         datastr += "\n" + "Grade Counts:"
-        gradeCounts = list(data2["gradecounts"].keys())
+        gradeCounts = sorted(list(data2["gradecounts"].keys()), key =lambda x:util.getOrder(x), reverse=True)
         for item in gradeCounts:
             datastr += "\n\t" + str(item) + ":\t" + str(data2["gradecounts"][item])
-        datastr += "\n" + "Students:\n"
 
-        pandas.set_option('display.max_rows', None)
-        pandas.set_option('display.max_columns', 3)
-        pandas.set_option('display.width', 1000)
-        pandas.set_option('display.colheader_justify', 'center')
-        pandas.set_option('display.precision', 2)        
-        datastr += data2["data"].to_string(col_space = 20)
+        gradeCountsDict = data2["gradecounts"]
+        datastr += "\n" + "Students:"
+
+        students: pandas.DataFrame = data2["data"]
+        datastr += "\n\t%15s %15s %7s %6s %8s" % (
+            students.columns[0], students.columns[1], students.columns[2], students.columns[3], students.columns[4])
+        for i in range(len(students.index)):
+            datastr += "\n\t%s %s %s %s %s" % (
+                str(students.iloc[i][0]).strip().ljust(20, " "), 
+                str(students.iloc[i][1]).strip().ljust(20, " "),
+                str(students.iloc[i][2]).strip().ljust(7, " "),
+                str(students.iloc[i][3]).strip().ljust(6, " "),
+                str(students.iloc[i][4]).strip().ljust(8, " ")
+            )
+    generate_graph(gradeCountsDict)
     calc_box.delete("1.0", tk.END)
     calc_box.insert(tk.END, datastr)
 
 def shiftIndexRight():
     global index, pages
+
+    if pages == None:
+        return 
+    
     if len(pages)-1 == index:
         index = 0
     else:
         index += 1
 
+    # Clear graph from canvas
+    for widget in graph_box.winfo_children():
+        widget.destroy()
+
     displayData()
     
 def shiftIndexLeft():
     global index, pages
+
+    if pages == None:
+        return
+    
     if index == 0:
         index = len(pages)-1
     else:
         index -= 1
+    
+    # Clear graph from canvas
+    for widget in graph_box.winfo_children():
+        widget.destroy()
 
     displayData()
     
@@ -230,16 +270,33 @@ def getData():
         calc_box.delete("1.0", tk.END)
         calc_box.insert(tk.END, "Not a valid RUN file")
     else:
-        data = main.fetch(dir_box.get())
+        data = None
+        try:
+            data = main.fetch(dir_box.get())
+        except Exception:
+            calc_box.delete("1.0", tk.END)
+            calc_box.insert(tk.END, "Error reading RUN file")
+            return
         sec_data = data[0]
         grp_data = data[1]
         pages = list(grp_data.keys())
         pages.extend(list(sec_data.keys()))
         index = 0
         displayData()
+        
+#___________________________________________________________ATTACH________________________________________________________#
+    
+# Attach select_file function to browse button
+browse_button.config(command=select_file)
 
+# Attach clear_text function to clear button
+clear_button.config(command=clear_text)
+
+# Attach calc_text function to calc button
 calc_button.config(command= getData)
-left_button.config(command = shiftIndexLeft)
+
+# Attach clear_canvas function to arrow buttons
+left_button.config(command = (shiftIndexLeft))
 right_button.config(command = shiftIndexRight)
 
 #__________________________________________________________WEIGHTS________________________________________________________#
@@ -250,4 +307,3 @@ root.columnconfigure(1, weight=2)
 root.rowconfigure(3, weight=1)
 
 root.mainloop()
-

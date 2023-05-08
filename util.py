@@ -39,4 +39,13 @@ def isStandard(s: str):
 
 def constructPath(path: str, filename: str):
     return path + g.FILE_SEP + filename
+
+def getOrder(s: str):
+    if not isRegistered(s):
+        raise ValueError("not a registered grade type")
+    else:
+        val = GRADEMAP[s]
+        if val == None:
+            val = -1.0
+        return val
     

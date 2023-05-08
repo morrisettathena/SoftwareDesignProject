@@ -1,6 +1,7 @@
 import pandas as pd
 import globals as g
 
+
 def calculateSectionData(secdata: dict):
     df: pd.DataFrame = secdata["data"]
     secdata["mean"] = round(df[g.GRADE_VALUE_HEADER].mean(), g.DEC_PREC)
