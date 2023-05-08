@@ -13,6 +13,8 @@ import util
 from tkinter import * 
 from tkinter.ttk import *
 import matplotlib.ticker as ticker
+from pandastable import Table, TableModel
+from tkinter import scrolledtext
 
 root = tk.Tk()
 root.title("GPA Calculator")
@@ -49,23 +51,26 @@ dir_box.bind("<FocusIn>", lambda event: dir_box.delete(0, tk.END))
 dir_box.grid(row=3, column=0, padx=20, pady=10, sticky="w")
 
 # FILE CONTENTS BOX
-file_box = tk.Text(root, height=6, font=("Arial", 14), bg="white", fg="#a3a3a3", bd=0)
-file_box.insert(tk.END, ' File contents will be displayed here.\n\n If entering manually, use the following format (include quotations):\n\n "Last","First","Student ID","Grade"')
-file_box.bind("<FocusIn>", lambda event: file_box.delete(1.0, tk.END))
+file_box = tk.Text(root, height=3, font=("Arial", 14), bg="white", fg="#a3a3a3", bd=0)
+file_box.insert(INSERT, ' File contents will be displayed here.')
 file_box.grid(row=5, column=0, padx=20, pady=10, sticky="w", columnspan=2)
 
+# STUDENT BOX
+student_box = Text(root, height=7, font=("Arial", 14), bg="white", fg="#a3a3a3", bd=0)
+student_box.grid(row=6, column=0, padx=20, pady=10, sticky="w", columnspan=2)
+student_box.grid_propagate(False)
+
 # CALCULATION BOX
-calc_box = tk.Text(root, height=17, font=("Arial", 14), bg="white", fg="#a3a3a3", bd=0)
-calc_box.bind("<FocusIn>", lambda event: calc_box.delete(1.0, tk.END))
-calc_box.grid(row=6, column=0, padx=20, pady=10, sticky="nsew", columnspan=2)
+calc_box = tk.Text(root, height=12, font=("Arial", 14), bg="white", fg="#a3a3a3", bd=0)
+calc_box.grid(row=7, column=0, padx=20, pady=10, sticky="nsew", columnspan=2)
 
 # BOTTOM SPACER BOX
 bot_space = tk.Entry(root, width=100, bg="#CACBD1", fg="#CACBD1", bd=0)
-bot_space = bot_space.grid(row=7, column=0, padx=5, pady=5, sticky="ew")
+bot_space = bot_space.grid(row=8, column=0, padx=5, pady=5, sticky="ew")
 
 # GRAPH BOX
 graph_box = tk.Entry(root, width=100, bg="white", fg="white", bd=0)
-graph_box.grid(row=3, rowspan=4, column=3, columnspan=2, padx=20, pady=10, sticky="nse")
+graph_box.grid(row=3, rowspan=5, column=3, columnspan=2, padx=20, pady=10, sticky="nse")
 
 
 #________________________________________________________FUNCTIONS________________________________________________________#
@@ -101,7 +106,7 @@ def generate_graph(dictData: dict):
     # Add bar chart to window
     canvas = FigureCanvasTkAgg(fig, master=graph_box)
     canvas.draw()
-    canvas.get_tk_widget().pack(fill=tk.BOTH, expand=False)
+    canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
 
     # Return grades and num_students
 
@@ -109,9 +114,13 @@ def clear_text():
     dir_box.delete(0, tk.END)
     dir_box.insert(0, " Enter file path")
     file_box.delete(1.0, tk.END)
-    file_box.insert(tk.END, ' File contents will be displayed here.\n\n If entering manually, use the following format (include quotations):\n\n "Last","First","Student ID","Grade"')
+    file_box.insert(tk.END, ' File contents will be displayed here.')
     calc_box.delete(1.0, tk.END)
     calc_box.insert(tk.END, "")
+    for item in graph_box.winfo_children():
+            item.destroy()
+    for item in student_box.winfo_children():
+            item.destroy()
 
 def clear_canvas():
     global graph_canvas, graph_fig, graph_ax
@@ -194,6 +203,9 @@ def displayData():
             datastr += "\n\t" + str(grade) + ":\t" + str(count)
         gradeCountsDict = data2["gradecounts"]
 
+        for item in student_box.winfo_children():
+            item.destroy()
+
     elif pages[index].endswith("SEC"):
         data2 = sec_data[pages[index]]
 
@@ -210,22 +222,17 @@ def displayData():
             datastr += "\n\t" + str(item) + ":\t" + str(data2["gradecounts"][item])
 
         gradeCountsDict = data2["gradecounts"]
-        datastr += "\n" + "Students:"
 
         students: pandas.DataFrame = data2["data"]
-        datastr += "\n\t%15s %15s %7s %6s %8s" % (
-            students.columns[0], students.columns[1], students.columns[2], students.columns[3], students.columns[4])
-        for i in range(len(students.index)):
-            datastr += "\n\t%s %s %s %s %s" % (
-                str(students.iloc[i][0]).strip().ljust(20, " "), 
-                str(students.iloc[i][1]).strip().ljust(20, " "),
-                str(students.iloc[i][2]).strip().ljust(7, " "),
-                str(students.iloc[i][3]).strip().ljust(6, " "),
-                str(students.iloc[i][4]).strip().ljust(8, " ")
-            )
+
+        table = pt = Table(student_box, dataframe = students)
+        pt.show()
+        gradeCountsDict = data2["gradecounts"]
+
     generate_graph(gradeCountsDict)
     calc_box.delete("1.0", tk.END)
     calc_box.insert(tk.END, datastr)
+    
 
 def shiftIndexRight():
     global index, pages
