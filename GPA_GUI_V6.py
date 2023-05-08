@@ -30,18 +30,18 @@ grp_data = None
 pages: list = None
 
 # ROGER WILLIAMS LABEL
-title_label = ttk.Label(root, text="   Roger Williams", font=("Times New Roman", 20), foreground="white", background="#1E3261")
+title_label = ttk.Label(root, text="   Roger Williams", font=("Times New Roman", 20), foreground="white", background="#003865")
 title_label.grid(row=1, column=0, columnspan=5, pady=(10, 0), sticky="nsew")
 
 # UNIVERSITY LABEL
-univ_label = ttk.Label(root, text="  University", font=("Times New Roman", 27), foreground="#60ADF0", background="#1E3261")
+univ_label = ttk.Label(root, text="  University", font=("Times New Roman", 27), foreground="#A4C8E1", background="#003865")
 univ_label.grid(row=2, column=0, columnspan=5, pady=(0, 45), sticky="nsew")
 
 
 #__________________________________________________________TEXTBOXES______________________________________________________#
 
 # TOP SPACER BOX
-top_space = tk.Entry(root, width=500, bg="#1E3261", fg="#1E3261", bd=0)
+top_space = tk.Entry(root, width=500, bg="#003865", fg="#003865", bd=0)
 top_space = top_space.grid(row=0, rowspan=2, columnspan=5, pady=(0,30) , column=0, sticky="nesw")
 
 # FILE DIRECTORY BOX
@@ -57,6 +57,7 @@ file_box.grid(row=5, column=0, padx=20, pady=10, sticky="w", columnspan=2)
 
 # STUDENT BOX
 student_box = Text(root, height=7, font=("Arial", 14), bg="white", fg="#a3a3a3", bd=0)
+student_box.insert(INSERT, ' Results in this box will only show up for .SEC files')
 student_box.grid(row=6, column=0, padx=20, pady=10, sticky="w", columnspan=2)
 student_box.grid_propagate(False)
 
@@ -117,10 +118,13 @@ def clear_text():
     file_box.insert(tk.END, ' File contents will be displayed here.')
     calc_box.delete(1.0, tk.END)
     calc_box.insert(tk.END, "")
+    student_box.delete(1.0, tk.END)
+    student_box.insert(tk.END, ' Results in this box will only show up for .SEC files')
     for item in graph_box.winfo_children():
             item.destroy()
     for item in student_box.winfo_children():
             item.destroy()
+
 
 def clear_canvas():
     global graph_canvas, graph_fig, graph_ax
@@ -138,7 +142,7 @@ def exit_program():
 #__________________________________________________________BUTTONS________________________________________________________#
 
 # LEFT BUTTON
-left_button = tk.Button(root, width = 10, text="<<", bd=0, fg='white', bg='#1E3261')
+left_button = tk.Button(root, width = 10, text="<<", bd=0, fg='white', bg='#003865')
 left_button.grid(row = 3, columnspan=2, column = 3, pady=10, padx=250, sticky='w')
 
 # BROWSE BUTTON
@@ -154,7 +158,7 @@ clear_button = ttk.Button(root, text="Clear", width=10)
 clear_button.grid(row=4, column=0, pady=10, padx=20, sticky="e")
 
 # RIGHT BUTTON
-right_button = tk.Button(root, text=">>", width = 10, bd=0, fg='white', bg='#1E3261')
+right_button = tk.Button(root, text=">>", width = 10, bd=0, fg='white', bg='#003865')
 right_button.grid(row = 3, columnspan=2, column = 4, pady=10, padx=210, sticky='e')
 
 # EXIT BUTTON
