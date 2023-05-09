@@ -42,8 +42,8 @@ def readSecFile(filename: str):
     df = formatSecData(bruh)
 
     secData = {
-        "data": df,
-        "creditHours": creditHours
+        g.DATA_FIELD: df,
+        g.CREDIT_HOURS_FIELD: creditHours
     }
     return secData
 
@@ -56,6 +56,7 @@ def readGrpFile(filename: str):
     data = contents.readlines()
     data.pop(0) #Remove the header line
     data = [item.strip() for item in data if not item.isspace()] #Don't include whitespace
+    contents.close()
     return data
 
 def readRunFile(filename: str):
@@ -67,6 +68,7 @@ def readRunFile(filename: str):
     data = contents.readlines()
     data.pop(0) #Remove the header line
     data = [item.strip() for item in data if not item.isspace()] #Don't include whitespace
+    contents.close()
     return data
 
 def getFileType(filename: str):

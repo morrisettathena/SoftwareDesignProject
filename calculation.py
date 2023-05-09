@@ -15,11 +15,11 @@ def calculateSectionData(secdata: dict):
     Returns a dictionary containing all statistical information
     about a given section.
     """
-    df: pd.DataFrame = secdata["data"]
-    secdata["mean"] = round(df[g.GRADE_VALUE_HEADER].mean(), g.DEC_PREC)
-    secdata["stddev"] = round(df[g.GRADE_VALUE_HEADER].std(ddof=1), g.DEC_PREC)
-    secdata["numstudents"] = df.shape[0]
-    secdata["gradecounts"] = dict(df['Grades'].value_counts())
+    df: pd.DataFrame = secdata[g.DATA_FIELD]
+    secdata[g.MEAN_FIELD] = round(df[g.GRADE_VALUE_HEADER].mean(), g.DEC_PREC)
+    secdata[g.STDDEV_FIELD] = round(df[g.GRADE_VALUE_HEADER].std(ddof=1), g.DEC_PREC)
+    secdata[g.NUM_STUD_FIELD] = df.shape[0]
+    secdata[g.GRADE_COUNTS_FIELD] = dict(df[g.GRADE_HEADER].value_counts())
 
     return secdata
 
@@ -42,16 +42,16 @@ def calculateGroupData(secData: dict, grpSecs: list):
     grp = pd.DataFrame()
 
     for sec in grpSecs: #Form grp dataframe
-        grp = pd.concat([secData[sec]["data"], grp])
+        grp = pd.concat([secData[sec][g.DATA_FIELD], grp])
 
-    newdata["sections"] = grpSecs
-    newdata["mean"] = round(grp[g.GRADE_VALUE_HEADER].mean(), g.DEC_PREC)
-    newdata["stddev"] = round(grp[g.GRADE_VALUE_HEADER].std(), g.DEC_PREC)
-    newdata["numstudents"] = grp.shape[0]
-    newdata["gradecounts"] = dict(grp["Grades"].value_counts())
+    newdata[g.SECTION_FIELD] = grpSecs
+    newdata[g.MEAN_FIELD] = round(grp[g.GRADE_VALUE_HEADER].mean(), g.DEC_PREC)
+    newdata[g.STDDEV_FIELD] = round(grp[g.GRADE_VALUE_HEADER].std(), g.DEC_PREC)
+    newdata[g.NUM_STUD_FIELD] = grp.shape[0]
+    newdata[g.GRADE_COUNTS_FIELD] = dict(grp[g.GRADE_HEADER].value_counts())
     
     for sec in grpSecs: #Z-test calculation.
-        ztests[sec] = round((secData[sec]["mean"] - newdata["mean"])/newdata["stddev"], g.DEC_PREC)
-    newdata["ztests"] = ztests
+        ztests[sec] = round((secData[sec][g.MEAN_FIELD] - newdata[g.MEAN_FIELD])/newdata[g.STDDEV_FIELD], g.DEC_PREC)
+    newdata[g.ZTEST_FIELD] = ztests
 
     return newdata

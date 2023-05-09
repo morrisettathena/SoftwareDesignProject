@@ -18,7 +18,6 @@ import globals as g
 from tkinter import * 
 from tkinter.ttk import *
 from pandastable import Table
-
 #________________________________________________________FUNCTIONS________________________________________________________#
 
 def select_file():
@@ -96,14 +95,14 @@ def displayData():
     datastr = ""
 
     #If the data to be displayed is a GRP file, display data in GRP format
-    if pages[index].endswith("GRP"):
+    if pages[index].endswith(g.GRP_EXT):
         data2 = grp_data[pages[index]] #Fetch data from current index
 
         datastr += "\n" + "Group:\t" + str(pages[index])
         datastr += "\n" + "Sections and Z-test:"
 
         #Sort z-test data from lowest score to highest
-        ztestdata = sorted(data2["ztests"].items(), key=lambda x:x[1])
+        ztestdata = sorted(data2[g.ZTEST_FIELD].items(), key=lambda x:x[1])
         for item in ztestdata:
             datastr += "\n\t" + str(item[0]) + ":\t " + str(item[1])
             if item[1] >= g.HIGH_Z_SIG:
@@ -113,51 +112,48 @@ def displayData():
         datastr += "\n"
 
         #Display basic statistics
-        datastr += "\n" + "Mean:\t" + str(data2["mean"])
-        datastr += "\n" + "Standard Deviation:\t" + str(data2["stddev"])
-        datastr += "\n" + "Number of Students:\t" + str(data2["numstudents"])
+        datastr += "\n" + "Mean:\t" + str(data2[g.MEAN_FIELD])
+        datastr += "\n" + "Standard Deviation:\t" + str(data2[g.STDDEV_FIELD])
+        datastr += "\n" + "Number of Students:\t" + str(data2[g.NUM_STUD_FIELD])
         datastr += "\n" + "Grade Counts:"
 
         #Sort the grade counts in order of GPA
-        gradeCounts = sorted(list(data2["gradecounts"].keys()), key =lambda x:util.getOrder(x), reverse=True)
+        gradeCounts = sorted(list(data2[g.GRADE_COUNTS_FIELD].keys()), key =lambda x:util.getOrder(x), reverse=True)
         for item in gradeCounts:
             #Add all counts to view
-            datastr += "\n\t" + str(item) + ":\t" + str(data2["gradecounts"][item])
+            datastr += "\n\t" + str(item) + ":\t" + str(data2[g.GRADE_COUNTS_FIELD][item])
 
         #Dictionary which will be used for the graph
-        gradeCountsDict = data2["gradecounts"]
+        gradeCountsDict = data2[g.GRADE_COUNTS_FIELD]
 
         # Since no students will be displayed in the group view, remove the student view
         for item in student_box.winfo_children():
             item.destroy()
             
     #If the data to be displayed is a SEC file, display data in SEC format
-    elif pages[index].endswith("SEC"):
+    elif pages[index].endswith(g.SEC_EXT):
         data2 = sec_data[pages[index]] #Fetch data from current index
 
         #Display basic data
         datastr += "\n" + "Section:\t" + str(pages[index])
-        datastr += "\n" + "Credit Hours:\t" + str(data2["creditHours"]) + "\n"
-        datastr += "\n" + "Mean:\t" + str(data2["mean"])
-        datastr += "\n" + "Standard Deviation:\t" + str(data2["stddev"])
-        datastr += "\n" + "Number of Students:\t" + str(data2["numstudents"])
+        datastr += "\n" + "Credit Hours:\t" + str(data2[g.CREDIT_HOURS_FIELD]) + "\n"
+        datastr += "\n" + "Mean:\t" + str(data2[g.MEAN_FIELD])
+        datastr += "\n" + "Standard Deviation:\t" + str(data2[g.STDDEV_FIELD])
+        datastr += "\n" + "Number of Students:\t" + str(data2[g.NUM_STUD_FIELD])
         datastr += "\n" + "Grade Counts:"
 
         #Sort the grade counts by descending order of GPA
-        gradeCounts = sorted(list(data2["gradecounts"].keys()), key =lambda x:util.getOrder(x), reverse=True)
+        gradeCounts = sorted(list(data2[g.GRADE_COUNTS_FIELD].keys()), key =lambda x:util.getOrder(x), reverse=True)
         for item in gradeCounts:
-            datastr += "\n\t" + str(item) + ":\t" + str(data2["gradecounts"][item])
+            datastr += "\n\t" + str(item) + ":\t" + str(data2[g.GRADE_COUNTS_FIELD][item])
 
         #Dictionary which will be used for the graph
-        gradeCountsDict = data2["gradecounts"]
+        gradeCountsDict = data2[g.GRADE_COUNTS_FIELD]
 
         #Table of students from SEC file to be added to student view
-        students: pandas.DataFrame = data2["data"]
+        students: pandas.DataFrame = data2[g.DATA_FIELD]
         table = pt = Table(student_box, dataframe = students)
         pt.show()
-
-        #Dictionary which will be used for graph
-        gradeCountsDict = data2["gradecounts"]
 
     #Based on the grade counts of the SEC or GRP file, generate bar graph
     generate_graph(gradeCountsDict)
@@ -215,13 +211,13 @@ def sendToOutput(file: str, path: str):
     """
     Function which takes the list of data and creates a report in the same directory
     """
-    f = open(path + "/" + file + ".STATS", "w")
+    f = open(path + g.FILE_SEP + file + g.STATS_EXT, "w")
 
     for item in grp_data:
         f.write(item + " data: " + str(grp_data[item]) + "\n")
     for item in sec_data:
         z = sec_data[item].copy()
-        z.pop("data") 
+        z.pop(g.DATA_FIELD) 
         
         f.write(item + " data: " + str(z) + "\n")
         
@@ -235,7 +231,7 @@ def getData():
 
     path = dir_box.get()
 
-    if not path.endswith(".RUN"): #Error handling in case the file is not a RUN file
+    if not path.endswith(g.RUN_EXT): #Error handling in case the file is not a RUN file
         calc_box.delete("1.0", tk.END)
         calc_box.insert(tk.END, "Not a valid RUN file")
     else:
@@ -250,8 +246,8 @@ def getData():
         sec_data = data[0] #First index of data will always be section data
         grp_data = data[1] #Second index of data will always be grp data
 
-        runFile = path[path.rindex("/")+1:]
-        outputpath = path[:path.rindex("/")]
+        runFile = path[path.rindex(g.FILE_SEP)+1:]
+        outputpath = path[:path.rindex(g.FILE_SEP)]
         sendToOutput(runFile, outputpath) #Send report to txt file
         
         pages = list(grp_data.keys()) #List of GRP and SEC pages
@@ -355,7 +351,7 @@ clear_button.config(command=clear_text)
 calc_button.config(command= getData)
 
 # Attach clear_canvas function to arrow buttons
-left_button.config(command = (shiftIndexLeft))
+left_button.config(command = shiftIndexLeft)
 right_button.config(command = shiftIndexRight)
 
 #__________________________________________________________WEIGHTS________________________________________________________#

@@ -61,4 +61,3 @@ def getOrder(s: str):
         if val == None:
             val = -1.0
         return val
-    
