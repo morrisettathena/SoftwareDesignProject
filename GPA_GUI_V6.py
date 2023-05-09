@@ -96,7 +96,7 @@ def generate_graph(dictData: dict):
     fig = plt.Figure(figsize=(6, 4))
     a = fig.add_subplot(111)
 
-    ls = sorted([(k, v) for k, v in dictData.items()], key = lambda x:x[0])
+    ls = sorted([(k, v) for k, v in dictData.items()], key = lambda x:util.getOrder(x[0]), reverse=True)
     ls2 = list(zip(*ls))
 
 
@@ -202,9 +202,7 @@ def displayData():
         for item in gradeCounts:
             datastr += "\n\t" + str(item) + ":\t" + str(data2["gradecounts"][item])
 
-        for grade, count in data2["gradecounts"].items():
-            grade_counts[grade] = count
-            datastr += "\n\t" + str(grade) + ":\t" + str(count)
+       
         gradeCountsDict = data2["gradecounts"]
 
         for item in student_box.winfo_children():
