@@ -1,8 +1,5 @@
-Need to edit sizing of text boxes
-Need to add calculations code to calculate button
-Need to work out displaying graphs after calculate button is clicked
-Need to edit design to make it more appealing
+Run via GPA_GUI_V6.py
 
-Might need to add scroll bars for when size of boxes change
+Then, select data using interface and hit calculate
 
-
+A report will be generated called [RUNFILENAME].RUN.STATS in the same folder
