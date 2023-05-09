@@ -21,6 +21,8 @@ class TestCalculationMethods(unittest.TestCase):
 
     """Code adapted from https://stackoverflow.com/questions/22604564/create-pandas-dataframe-from-a-string"""
     def testCalculateSectionData(self):
+        print("\nTESTING calculateSectionData METHOD")
+
         data1 = """{0};{1}
         D;1.0
         C;2.0
@@ -54,20 +56,39 @@ class TestCalculationMethods(unittest.TestCase):
         dict1 = calculation.calculateSectionData(sec1data)
 
         #test to make sure that values are the same as independently calculated values
-        self.assertAlmostEqual(dict1[g.MEAN_FIELD], 2.73)
-        self.assertAlmostEqual(dict1[g.STDDEV_FIELD], 1.23)
-        self.assertEqual(dict1[g.NUM_STUD_FIELD], 7)
+        DATA1MEAN = 2.73
+        DATA1STDDEV = 1.23
+        DATA1STUDCOUNT = 7
+        self.assertAlmostEqual(dict1[g.MEAN_FIELD], DATA1MEAN)
+        self.assertAlmostEqual(dict1[g.STDDEV_FIELD], DATA1STDDEV)
+        self.assertEqual(dict1[g.NUM_STUD_FIELD], DATA1STUDCOUNT)
+        print("data 1: program results vs independently calculated:")
+        print("Mean:         {0} = {1}".format(dict1[g.MEAN_FIELD], DATA1MEAN))
+        print("Stddev:       {0} = {1}".format(dict1[g.STDDEV_FIELD], DATA1STDDEV))
+        print("Num_students: {0} = {1}".format(dict1[g.NUM_STUD_FIELD], DATA1STUDCOUNT))
 
         df2 = pd.read_csv(io.StringIO(data2), sep = ";")
         sec2data = {g.DATA_FIELD: df2}
         dict2 = calculation.calculateSectionData(sec2data)
 
         #test to make sure that values are the same as independently calculated values
-        self.assertAlmostEqual(dict2[g.MEAN_FIELD], 2.37)
-        self.assertAlmostEqual(dict2[g.STDDEV_FIELD], 1.30)
-        self.assertEqual(dict2[g.NUM_STUD_FIELD], 15)
+        DATA2MEAN = 2.37
+        DATA2STDDEV = 1.30
+        DATA2STUDCOUNT = 15
+        self.assertAlmostEqual(dict2[g.MEAN_FIELD], DATA2MEAN)
+        self.assertAlmostEqual(dict2[g.STDDEV_FIELD], DATA2STDDEV)
+        self.assertEqual(dict2[g.NUM_STUD_FIELD], DATA2STUDCOUNT)
 
+        print("data 2: program results vs independently calculated:")
+        print("Mean:         {0} = {1}".format(dict2[g.MEAN_FIELD], DATA2MEAN))
+        print("Stddev:       {0} = {1}".format(dict2[g.STDDEV_FIELD], DATA2STDDEV))
+        print("Num_students: {0} = {1}".format(dict2[g.NUM_STUD_FIELD], DATA2STUDCOUNT))
+
+        print("calculateSectionData IS SUCCESFUL\n")
+        
     def testCalculateGroupData(self):
+        print("\nTESTING calculateGroupData METHOD")
+
         sec1 = """Grades;GradeVal
         NP;
         B-;2.67
@@ -146,45 +167,84 @@ class TestCalculationMethods(unittest.TestCase):
         newdata = calculation.calculateGroupData(sections, group_sections)
 
         #test to make sure that values are the same as independendently calculated values
-        self.assertAlmostEqual(newdata[g.MEAN_FIELD], 2.41)
-        self.assertAlmostEqual(newdata[g.STDDEV_FIELD], 1.11)
-        self.assertEqual(newdata[g.NUM_STUD_FIELD], 47)
-        self.assertAlmostEqual(newdata[g.ZTEST_FIELD]["sec1"], -0.07)
-        self.assertAlmostEqual(newdata[g.ZTEST_FIELD]["sec2"], -0.05)
-        self.assertAlmostEqual(newdata[g.ZTEST_FIELD]["sec3"],  0.15)
+        DATAMEAN = 2.41
+        DATASTDDEV = 1.11
+        DATASTUDCOUNT = 47
+        DATAZTEST1 = -0.07
+        DATAZTEST2 = -0.05
+        DATAZTEST3 = 0.15
+        self.assertAlmostEqual(newdata[g.MEAN_FIELD], DATAMEAN)
+        self.assertAlmostEqual(newdata[g.STDDEV_FIELD], DATASTDDEV)
+        self.assertEqual(newdata[g.NUM_STUD_FIELD], DATASTUDCOUNT)
+        self.assertAlmostEqual(newdata[g.ZTEST_FIELD]["sec1"], DATAZTEST1)
+        self.assertAlmostEqual(newdata[g.ZTEST_FIELD]["sec2"], DATAZTEST2)
+        self.assertAlmostEqual(newdata[g.ZTEST_FIELD]["sec3"],  DATAZTEST3)
+
+        print("program results vs independently calculated:")
+        print("Mean:         {0} = {1}".format(newdata[g.MEAN_FIELD], DATAMEAN))
+        print("Stddev:       {0} = {1}".format(newdata[g.STDDEV_FIELD], DATASTDDEV))
+        print("Num_students: {0} = {1}".format(newdata[g.NUM_STUD_FIELD], DATASTUDCOUNT))
+        print("Z-test 1:     {0} = {1}".format(newdata[g.ZTEST_FIELD]["sec1"], DATAZTEST1))
+        print("Z-test 2:     {0} = {1}".format(newdata[g.ZTEST_FIELD]["sec2"], DATAZTEST2))
+        print("Z-test 3:     {0} = {1}".format(newdata[g.ZTEST_FIELD]["sec3"], DATAZTEST3))
+
+        print("calculateGroupData IS SUCCESFUL\n")
 
 class TestUtilMethods(unittest.TestCase):
 
     def testIsRegistered(self):
+        print("\nTESTING isRegistered METHOD")
         for item in util.GRADEMAP.keys():
             self.assertTrue(util.isRegistered(item))
+            print("Grade {0} is recognized".format(item))
         self.assertFalse(util.isRegistered("erawoier"))
         self.assertFalse(util.isRegistered("+"))
         self.assertFalse(util.isRegistered("-"))
+        print("Grade \"erawoier\" sucessfully discarded")
+        print("Grade \"+\" sucessfully discarded")
+        print("Grade \"-\" sucessfully discarded")
+        print("isRegistered IS SUCCESFUL\n")
 
     def testGradeToValue(self):
+        print("\nTESTING gradeToValue METHOD")
+        print("program results vs map:")
         for item in util.GRADEMAP.items():
             util.GRADEMAP[item[0]] == item[1]
+            print("{0} = {1}".format(item[0], util.GRADEMAP[item[0]]))
+        print("gradeToValue IS SUCCESFUL\n")
 
     def testConstructPath(self):
+        print("\nTESTING constructPath METHOD")
         path = "testing"
         file = "x"
         pathconstruct = util.constructPath(path, file)
-        self.assertEqual("testing/x", pathconstruct)
+
+        EXPLICIT_STRING = "testing/x"
+        self.assertEqual(EXPLICIT_STRING, pathconstruct)
+        print("program results vs explicit string:")
+        print("{0} = {1}".format(EXPLICIT_STRING, pathconstruct))
+        print("constructPath IS SUCCESFUL\n")
 
     def testGetOrder(self):
+        print("\nTESTING getOrder METHOD")
+        print("program results vs map:")
         for item in util.GRADEMAP.items():
             if item[1] == None:
                 self.assertEqual(-1, util.getOrder(item[0]))
+                print("{0} = {1}".format(item[0], -1))
             else:
                 self.assertEqual(item[1], util.getOrder(item[0]))
+                print("{0} = {1}".format(item[0], util.GRADEMAP[item[0]]))
 
         with self.assertRaises(ValueError):
             util.getOrder("willFail")
+        
+        print("getOrder IS SUCCESFUL\n")
 
 class TestReaderMethods(unittest.TestCase):
 
     def testReadSecFile(self):
+        print("\nTESTING readSecFile METHOD")
         c110S20_data = reader.readSecFile("testdata/COMSC110S20.SEC")
         teststring = """First Name;Last Name;ID;Grades;GradeVal
     Pfssb;Hcfw;6713436;C+;2.33
@@ -200,19 +260,45 @@ class TestReaderMethods(unittest.TestCase):
             for j in range(len(testdf.columns)):
                 self.assertEqual(str(testdf.iloc[i][j]), str(c110S20_data[g.DATA_FIELD].iloc[i][j]))
 
+        print("read in program df vs test df based on same text file")
+        print("program:")
+        print(c110S20_data[g.DATA_FIELD])
+        print("test:")
+        print(testdf)
+
+        print("readSecFile IS SUCCESFUL\n")
+        
     def testReadGrpFile(self):
+        print("\nTESTING readGrpFile METHOD")
         c110_data = reader.readGrpFile("testdata/COMSC110.GRP")
         testlist = ["COMSC110S20.SEC", "COMSC110S21.SEC"]
 
         for i in range(len(testlist)):
             self.assertEqual(c110_data[i], testlist[i])
 
+        print("read in program group data vs list based on same text file")
+        print("program:")
+        print(c110_data)
+        print("test:")
+        print(testlist)
+
+        print("readGrpFile IS SUCCESFUL\n")
+
     def testReadRunFile(self):
+        print("\nTESTING readRunFile METHOD")
         testrun_data = reader.readRunFile("testdata/TESTRUN.RUN")
         testlist = ["COMSC110.GRP", "COMSC200.GRP"]
 
         for i in range(len(testlist)):
             self.assertEqual(testrun_data[i], testlist[i])
+
+        print("read in program run data vs list based on same text file")
+        print("program:")
+        print(testrun_data)
+        print("test:")
+        print(testlist)
+
+        print("readRunFile IS SUCCESFUL\n")
 
 class TestMainMethods(unittest.TestCase):
 
